@@ -2,22 +2,22 @@
 inlets = 1;
 outlets = 1;
 
-let welikia = new Global("welikia");
+let biomassDB = new Global("biomassDB");
 
 
 function get(type, subtype)
 {
     
     if (type == "ecosystems") {
-        let ecos = Object.keys(welikia.db.ecosystems);
+        let ecos = Object.keys(biomassDB.ecosystems);
         outlet(0, "ecosystems", ecos);
-        if (subtype in welikia.db.ecosystems) {
-            let timesOfDay = welikia.db.ecosystems[subtype].files.map(item => item.time_of_day);
+        if (subtype in biomassDB.ecosystems) {
+            let timesOfDay = biomassDB.ecosystems[subtype].files.map(item => item.time_of_day);
             outlet(0, "timesOfDay", timesOfDay);
         }
     }
     if (type == "weather") {
-        outlet(0, "weather", welikia.db.ecosystems[timeOfDay]);
+        outlet(0, "weather", biomassDB.ecosystems[timeOfDay]);
     }
 
 }
@@ -25,30 +25,21 @@ function get(type, subtype)
 function getFile(type="ecosystem", subtype, timeOfDay) {
     post("getFile", type, subtype, timeOfDay, "\n");
 
-    if (type == "ecosystem" && subtype in welikia.db.ecosystems && timeOfDay) {
-        let fileObj = welikia.db.ecosystems[subtype].files.find(item => item.time_of_day === timeOfDay);
-        post(fileObj.file, "\n");
-        outlet(0, "file", fileObj.file);
+    if (type == "ecosystem" && subtype in biomassDB.ecosystems && timeOfDay) {
+        let fileObj = biomassDB.ecosystems[subtype].files.find(item => item.time_of_day === timeOfDay);
+        post(fileObj.filename, "\n");
+        outlet(0, "file", fileObj.filename);
     } else {
-        post(subtype, subtype in welikia.db.ecosystems);
-        post(welikia.db.ecosystems[subtype].files.find(item => item.time_of_day === timeOfDay));
-        post(welikia.db.ecosystems[subtype].files.map(item => item.time_of_day),"\n");
-        post(timeOfDay in welikia.db.ecosystems[subtype].files.map(item => item.time_of_day),"\n");
+        post(subtype, subtype in biomassDB.ecosystems);
+        post(biomassDB.ecosystems[subtype].files.find(item => item.time_of_day === timeOfDay));
+        post(biomassDB.ecosystems[subtype].files.map(item => item.time_of_day),"\n");
+        post(timeOfDay in biomassDB.ecosystems[subtype].files.map(item => item.time_of_day),"\n");
     }
 }
 
 function bang()
 {
-	// basic_getting_and_setting();
-	// importing_and_exporting();
-	
-    
-    
-	// additional functions available for dict:
-	
-	// x.clone("ark");
-	// x.remove("pig");
-	// x.clear();
+
 	
 }
 
@@ -76,7 +67,7 @@ function load(file="welikia.json") {
     post((typeof welikiaString), "\n", welikiaString);
     
     try {
-        welikia.db = JSON.parse(welikiaString);
+        biomassDB.db = JSON.parse(welikiaString);
         // Process parsedData
     } catch (e) {
         post("JSON parsing error:", e, "\n");
@@ -86,22 +77,22 @@ function load(file="welikia.json") {
     f.close();
     
 
-    post("database loaded", (typeof welikia));
-    post(welikia.db.title, welikia.db.ecosystems.forest.label);
+    post("database loaded", biomassDB.title), "\n" );
+    post(biomassDB.title, biomassDB.ecosystems.forest.label);
     outlet(0, "database", file);
 }
 
 
 function init() {
     try {
-          if (welikia.db.title) {
-              post('Welikia Sound database loaded.')
+          if (biomassDB.title) {
+              post('Sound database loaded.')
           } else {
               load();
           }
         }
     catch {
-        post('Welikia Sound database failed.')
+        post('Sound database failed.')
     }
         
 }
